@@ -542,9 +542,121 @@
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 2px; }
+  /* PASSWORD SCREEN */
+  #passwordScreen {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    gap: 24px;
+  }
+
+  #passwordScreen.hidden { display: none; }
+
+  .pass-logo {
+    font-size: 48px;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .pass-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-align: center;
+  }
+
+  .pass-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-family: 'Space Mono', monospace;
+    text-align: center;
+  }
+
+  .pass-input-wrap {
+    width: 100%;
+    max-width: 320px;
+    position: relative;
+  }
+
+  .pass-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: 16px;
+    padding: 14px 48px 14px 18px;
+    outline: none;
+    text-align: center;
+    letter-spacing: 4px;
+    transition: border-color 0.3s;
+  }
+
+  .pass-input:focus { border-color: var(--gold-dark); }
+  .pass-input.error { border-color: var(--red); animation: shake 0.3s; }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+  }
+
+  .pass-btn {
+    width: 100%;
+    max-width: 320px;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    border: none;
+    border-radius: 12px;
+    color: #000;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .pass-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(212,175,55,0.3); }
+
+  .pass-error {
+    font-size: 12px;
+    color: var(--red);
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 1px;
+    display: none;
+  }
+
+  .pass-error.show { display: block; }
 </style>
 </head>
 <body>
+
+<!-- PASSWORD SCREEN -->
+<div id="passwordScreen">
+  <div class="pass-logo">🔐</div>
+  <div>
+    <div class="pass-title">Forex Analyzer</div>
+    <div class="pass-sub">Masukkan password untuk akses</div>
+  </div>
+  <div class="pass-input-wrap">
+    <input type="password" id="passInput" class="pass-input" placeholder="••••••••••"
+      onkeydown="if(event.key==='Enter') checkPassword()" autofocus />
+  </div>
+  <button class="pass-btn" onclick="checkPassword()">🔓 MASUK</button>
+  <div class="pass-error" id="passError">❌ Password salah. Coba lagi.</div>
+  <div style="font-size:10px;color:var(--text-muted);text-align:center;max-width:280px;line-height:1.6;">
+    Akses terbatas. Hubungi admin jika belum punya password.
+  </div>
+</div>
 
 <header>
   <div class="logo-icon">📊</div>
@@ -641,6 +753,38 @@
 </main>
 
 <script>
+// PASSWORD CHECK
+const PASS_HASH = '7536f09573c3062b68cdd821fe9c0fc8a5b0f8de0ea5011b40dc5f95cee9b1c2';
+
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function checkPassword() {
+  const input = document.getElementById('passInput');
+  const errEl = document.getElementById('passError');
+  const hash = await sha256(input.value);
+  if (hash === PASS_HASH) {
+    localStorage.setItem('fxa_auth', hash);
+    document.getElementById('passwordScreen').classList.add('hidden');
+  } else {
+    input.classList.add('error');
+    errEl.classList.add('show');
+    setTimeout(() => input.classList.remove('error'), 400);
+    input.value = '';
+    input.focus();
+  }
+}
+
+// Cek apakah sudah login sebelumnya
+(async () => {
+  const saved = localStorage.getItem('fxa_auth');
+  if (saved === PASS_HASH) {
+    document.getElementById('passwordScreen').classList.add('hidden');
+  }
+})();
+
 const uploadZone = document.getElementById('uploadZone');
 const fileInput = document.getElementById('fileInput');
 const previewImg = document.getElementById('previewImg');
