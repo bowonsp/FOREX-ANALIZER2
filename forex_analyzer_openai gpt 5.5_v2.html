@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#D4AF37">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Forex Analyzer">
+<title>Forex & Gold Analyzer</title>
+<link rel="manifest" href="data:application/json;charset=utf-8,{%22name%22:%22Forex%20Gold%20Analyzer%22,%22short_name%22:%22ForexAI%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%230A0A0A%22,%22theme_color%22:%22%23D4AF37%22,%22icons%22:[{%22src%22:%22data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23D4AF37'/><text y='.9em' font-size='80' x='10'>📊</text></svg>%22,%22sizes%22:%22any%22,%22type%22:%22image/svg+xml%22}]}">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600&display=swap');
+
+  :root {
+    --gold: #D4AF37;
+    --gold-light: #F2D06B;
+    --gold-dark: #9A7C1E;
+    --bg: #0A0A0A;
+    --surface: #111111;
+    --surface2: #1A1A1A;
+    --surface3: #222222;
+    --border: #2A2A2A;
+    --text: #E8E8E8;
+    --text-muted: #666;
+    --green: #00C896;
+    --red: #FF4757;
+    --blue: #4A9EFF;
+    --wait: #F0A500;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, #0A0A0A 0%, #111111 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold-light));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .logo-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    line-height: 1;
+  }
+
+  .logo-sub {
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+
+  .live-badge {
+    margin-left: auto;
+    background: rgba(0, 200, 150, 0.15);
+    border: 1px solid var(--green);
+    color: var(--green);
+    font-size: 10px;
+    font-family: 'Space Mono', monospace;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .live-dot {
+    width: 6px; height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* MAIN */
+  main {
+    padding: 16px;
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-bottom: 80px;
+  }
+
+  /* UPLOAD ZONE */
+  .upload-zone {
+    border: 2px dashed var(--gold-dark);
+    border-radius: 16px;
+    padding: 32px 20px;
+    text-align: center;
+    background: radial-gradient(ellipse at center, rgba(212,175,55,0.05) 0%, transparent 70%);
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .upload-zone::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(212,175,55,0.03), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .upload-zone:hover::before, .upload-zone.drag-over::before {
+    opacity: 1;
+  }
+
+  .upload-zone:hover, .upload-zone.drag-over {
+    border-color: var(--gold);
+    transform: translateY(-1px);
+  }
+
+  .upload-zone.drag-over {
+    background: radial-gradient(ellipse at center, rgba(212,175,55,0.1) 0%, transparent 70%);
+  }
+
+  .upload-icon {
+    font-size: 40px;
+    margin-bottom: 12px;
+    display: block;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  .upload-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+
+  .upload-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .upload-sub span {
+    color: var(--gold-light);
+    font-weight: 500;
+  }
+
+  #fileInput { display: none; }
+
+  .preview-img {
+    width: 100%;
+    border-radius: 12px;
+    max-height: 200px;
+    object-fit: cover;
+    margin-top: 16px;
+    border: 1px solid var(--border);
+  }
+
+  /* ANALYZE BUTTON */
+  .btn-analyze {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    border: none;
+    border-radius: 12px;
+    color: #000;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 3px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-analyze::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+  }
+
+  .btn-analyze:hover::before { left: 100%; }
+  .btn-analyze:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(212,175,55,0.3); }
+  .btn-analyze:active { transform: translateY(0); }
+  .btn-analyze:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* LOADING */
+  .loading {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 32px;
+    background: var(--surface);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+  }
+
+  .loading.show { display: flex; }
+
+  .loader-ring {
+    width: 52px; height: 52px;
+    border: 3px solid var(--border);
+    border-top: 3px solid var(--gold);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--gold);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .loading-dots span {
+    animation: blink 1.2s infinite;
+    color: var(--gold);
+  }
+  .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes blink {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
+  }
+
+  /* RESULT SECTIONS */
+  .result-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    animation: slideUp 0.4s ease;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-header {
+    padding: 14px 18px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-num {
+    width: 24px; height: 24px;
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: #000;
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 2px;
+    color: var(--gold-light);
+  }
+
+  .section-body {
+    padding: 16px 18px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  /* SIGNAL CARD */
+  .signal-card {
+    background: var(--surface3);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+
+  .signal-direction {
+    text-align: center;
+    padding: 20px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    letter-spacing: 6px;
+  }
+
+  .signal-direction.buy {
+    background: linear-gradient(135deg, rgba(0,200,150,0.15), rgba(0,200,150,0.05));
+    color: var(--green);
+    border-bottom: 2px solid var(--green);
+  }
+
+  .signal-direction.sell {
+    background: linear-gradient(135deg, rgba(255,71,87,0.15), rgba(255,71,87,0.05));
+    color: var(--red);
+    border-bottom: 2px solid var(--red);
+  }
+
+  .signal-direction.wait {
+    background: linear-gradient(135deg, rgba(240,165,0,0.15), rgba(240,165,0,0.05));
+    color: var(--wait);
+    border-bottom: 2px solid var(--wait);
+  }
+
+  .signal-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+  }
+
+  .signal-item {
+    background: var(--surface2);
+    padding: 12px 14px;
+  }
+
+  .signal-label {
+    font-size: 9px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .signal-value {
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gold-light);
+  }
+
+  .signal-value.green { color: var(--green); }
+  .signal-value.red { color: var(--red); }
+  .signal-value.blue { color: var(--blue); }
+
+  /* MARKET BADGES */
+  .badge-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 1px;
+    font-weight: 700;
+  }
+
+  .badge-bull { background: rgba(0,200,150,0.15); color: var(--green); border: 1px solid rgba(0,200,150,0.3); }
+  .badge-bear { background: rgba(255,71,87,0.15); color: var(--red); border: 1px solid rgba(255,71,87,0.3); }
+  .badge-neutral { background: rgba(240,165,0,0.15); color: var(--wait); border: 1px solid rgba(240,165,0,0.3); }
+  .badge-info { background: rgba(74,158,255,0.15); color: var(--blue); border: 1px solid rgba(74,158,255,0.3); }
+
+  /* LEVEL BARS */
+  .level-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .level-item:last-child { border-bottom: none; }
+
+  .level-label { font-size: 12px; color: var(--text-muted); }
+  .level-price {
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  /* RISK BOX */
+  .risk-box {
+    background: rgba(255,71,87,0.08);
+    border: 1px solid rgba(255,71,87,0.2);
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 12px;
+    line-height: 1.7;
+    color: #FFB3B3;
+  }
+
+  .risk-title {
+    color: var(--red);
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    font-family: 'Space Mono', monospace;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* REASON LIST */
+  .reason-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .reason-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .reason-list li::before {
+    content: '▸';
+    color: var(--gold);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ERROR BOX */
+  .error-box {
+    background: rgba(255,71,87,0.1);
+    border: 1px solid rgba(255,71,87,0.3);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    color: var(--red);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  /* DISCLAIMER */
+  .disclaimer {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    text-align: center;
+    font-size: 10px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .disclaimer strong {
+    color: var(--gold-dark);
+    display: block;
+    margin-bottom: 4px;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* RR BADGE */
+  .rr-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(74,158,255,0.15);
+    border: 1px solid rgba(74,158,255,0.3);
+    color: var(--blue);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  /* MARKDOWN RENDER */
+  .md-content h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 2px;
+    color: var(--gold-light);
+    margin: 16px 0 8px;
+  }
+
+  .md-content p { margin-bottom: 10px; }
+  .md-content strong { color: var(--gold-light); }
+  .md-content em { color: var(--text-muted); font-style: italic; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-icon">📊</div>
+  <div>
+    <div class="logo-text">Forex Analyzer</div>
+    <div class="logo-sub">Multi Pair Trading Intelligence</div>
+  </div>
+  <div class="live-badge">
+    <div class="live-dot"></div>
+    AI LIVE
+  </div>
+</header>
+
+<main>
+
+  <!-- API KEY INPUT -->
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <label style="font-size:11px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;font-family:'Space Mono',monospace;">OpenAI API Key</label>
+      <button onclick="clearKey()" id="clearKeyBtn" style="display:none;background:rgba(255,71,87,0.15);border:1px solid rgba(255,71,87,0.3);color:var(--red);font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1px;padding:3px 8px;border-radius:6px;cursor:pointer;">🗑 HAPUS KEY</button>
+    </div>
+    <div style="position:relative;">
+      <input type="password" id="apiKeyInput" placeholder="sk-proj-..." style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Space Mono',monospace;font-size:12px;padding:12px 44px 12px 14px;width:100%;outline:none;" />
+      <button onclick="toggleKey()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px;" id="eyeBtn">👁</button>
+    </div>
+    <div id="keyStatus" style="font-size:10px;color:var(--text-muted);">Key tersimpan di browser, tidak dikirim ke mana pun selain OpenAI.</div>
+  </div>
+
+  <!-- PAIR SELECTOR -->
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <label style="font-size:11px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;font-family:'Space Mono',monospace;">Pilih Pair</label>
+    <select id="pairSelect" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--gold);font-family:'Space Mono',monospace;font-size:13px;padding:12px 14px;width:100%;outline:none;cursor:pointer;">
+      <option value="auto">🔍 Auto Detect dari Chart</option>
+      <optgroup label="Komoditas">
+        <option value="XAUUSD">XAUUSD – Gold</option>
+        <option value="XAGUSD">XAGUSD – Silver</option>
+      </optgroup>
+      <optgroup label="Major Pairs">
+        <option value="EURUSD">EURUSD</option>
+        <option value="GBPUSD">GBPUSD</option>
+        <option value="USDJPY">USDJPY</option>
+        <option value="USDCHF">USDCHF</option>
+        <option value="AUDUSD">AUDUSD</option>
+        <option value="NZDUSD">NZDUSD</option>
+        <option value="USDCAD">USDCAD</option>
+      </optgroup>
+      <optgroup label="Minor Pairs">
+        <option value="GBPJPY">GBPJPY</option>
+        <option value="EURJPY">EURJPY</option>
+        <option value="EURGBP">EURGBP</option>
+        <option value="GBPAUD">GBPAUD</option>
+      </optgroup>
+    </select>
+  </div>
+
+  <!-- UPLOAD ZONE -->
+  <div class="upload-zone" id="uploadZone">
+    <span class="upload-icon">📈</span>
+    <div class="upload-title">Upload Chart H1</div>
+    <div class="upload-sub">
+      Tap untuk pilih gambar atau drag & drop<br>
+      Format: <span>JPG, PNG, WEBP</span> · Max <span>10MB</span>
+    </div>
+    <input type="file" id="fileInput" accept="image/*">
+    <img id="previewImg" class="preview-img" style="display:none">
+  </div>
+
+  <!-- ANALYZE BUTTON -->
+  <button class="btn-analyze" id="analyzeBtn" disabled>
+    ⚡ ANALISA SEKARANG
+  </button>
+
+  <!-- LOADING -->
+  <div class="loading" id="loading">
+    <div class="loader-ring"></div>
+    <div class="loading-text">
+      Menganalisa Chart<span class="loading-dots"><span>.</span><span>.</span><span>.</span></span>
+    </div>
+    <div style="font-size:11px;color:var(--text-muted);text-align:center;">
+      AI sedang membaca struktur pasar & price action
+    </div>
+  </div>
+
+  <!-- RESULTS CONTAINER -->
+  <div id="resultsContainer"></div>
+
+  <!-- DISCLAIMER -->
+  <div class="disclaimer">
+    <strong>⚠️ Disclaimer Risiko</strong>
+    Analisa ini hanya untuk tujuan edukasi & referensi. Bukan saran investasi.
+    Trading forex & komoditas mengandung risiko tinggi. Selalu gunakan manajemen risiko yang baik.
+  </div>
+
+</main>
+
+<script>
+const uploadZone = document.getElementById('uploadZone');
+const fileInput = document.getElementById('fileInput');
+const previewImg = document.getElementById('previewImg');
+const analyzeBtn = document.getElementById('analyzeBtn');
+const loading = document.getElementById('loading');
+const resultsContainer = document.getElementById('resultsContainer');
+const apiKeyInput = document.getElementById('apiKeyInput');
+const clearKeyBtn = document.getElementById('clearKeyBtn');
+const keyStatus = document.getElementById('keyStatus');
+
+// Load API key dari localStorage
+const savedKey = localStorage.getItem('openai_api_key');
+if (savedKey) {
+  apiKeyInput.value = savedKey;
+  clearKeyBtn.style.display = 'block';
+  keyStatus.textContent = '✅ Key tersimpan — langsung bisa analisa.';
+  keyStatus.style.color = 'var(--green)';
+}
+
+function saveKey() {
+  const val = apiKeyInput.value.trim();
+  if (val) {
+    localStorage.setItem('openai_api_key', val);
+    clearKeyBtn.style.display = 'block';
+    keyStatus.textContent = '✅ Key tersimpan otomatis.';
+    keyStatus.style.color = 'var(--green)';
+  }
+}
+
+// Simpan di semua event: input, change, blur, paste
+apiKeyInput.addEventListener('input', saveKey);
+apiKeyInput.addEventListener('change', saveKey);
+apiKeyInput.addEventListener('blur', saveKey);
+apiKeyInput.addEventListener('paste', () => setTimeout(saveKey, 100));
+
+function clearKey() {
+  if (!confirm('Hapus API key yang tersimpan?')) return;
+  localStorage.removeItem('openai_api_key');
+  apiKeyInput.value = '';
+  clearKeyBtn.style.display = 'none';
+  keyStatus.textContent = 'Key tersimpan di browser, tidak dikirim ke mana pun selain OpenAI.';
+  keyStatus.style.color = 'var(--text-muted)';
+}
+
+function toggleKey() {
+  const input = document.getElementById('apiKeyInput');
+  const btn = document.getElementById('eyeBtn');
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.textContent = '🙈';
+  } else {
+    input.type = 'password';
+    btn.textContent = '👁';
+  }
+}
+
+// PWA: Add to Home Screen prompt
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Tampilkan banner install
+  const banner = document.createElement('div');
+  banner.id = 'installBanner';
+  banner.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:linear-gradient(135deg,#1A1A1A,#222);border-top:1px solid var(--gold-dark);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;z-index:999;gap:10px;';
+  banner.innerHTML = `
+    <div>
+      <div style="font-size:12px;color:var(--gold);font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">📲 PASANG KE HOME SCREEN</div>
+      <div style="font-size:10px;color:var(--text-muted);">Buka tanpa cari file HTML lagi</div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button onclick="installApp()" style="background:linear-gradient(135deg,var(--gold-dark),var(--gold));border:none;color:#000;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;padding:8px 16px;border-radius:8px;cursor:pointer;">PASANG</button>
+      <button onclick="document.getElementById('installBanner').remove()" style="background:var(--surface3);border:1px solid var(--border);color:var(--text-muted);font-size:11px;padding:8px 10px;border-radius:8px;cursor:pointer;">✕</button>
+    </div>
+  `;
+  document.body.appendChild(banner);
+});
+
+async function installApp() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  document.getElementById('installBanner')?.remove();
+}
+
+let selectedImageBase64 = null;
+let selectedImageType = null;
+
+// Click upload zone
+uploadZone.addEventListener('click', () => fileInput.click());
+
+// Drag & drop
+uploadZone.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  uploadZone.classList.add('drag-over');
+});
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+uploadZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  uploadZone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) handleFile(file);
+});
+
+fileInput.addEventListener('change', () => {
+  if (fileInput.files[0]) handleFile(fileInput.files[0]);
+});
+
+function handleFile(file) {
+  selectedImageType = file.type;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const result = e.target.result;
+    selectedImageBase64 = result.split(',')[1];
+    previewImg.src = result;
+    previewImg.style.display = 'block';
+    analyzeBtn.disabled = false;
+    resultsContainer.innerHTML = '';
+  };
+  reader.readAsDataURL(file);
+}
+
+analyzeBtn.addEventListener('click', analyzeChart);
+
+async function analyzeChart() {
+  if (!selectedImageBase64) return;
+
+  analyzeBtn.disabled = true;
+  loading.classList.add('show');
+  resultsContainer.innerHTML = '';
+
+  const selectedPair = document.getElementById('pairSelect').value;
+  const pairContext = selectedPair === 'auto'
+    ? 'Identifikasi pair dan timeframe secara otomatis dari chart.'
+    : `Pair yang dianalisa adalah ${selectedPair} timeframe H1.`;
+
+  const systemPrompt = `Kamu adalah analis trading profesional untuk berbagai pair forex dan komoditas.
+Analisa chart yang diberikan secara mendalam menggunakan instruksi berikut, lalu berikan respons dalam format JSON yang KETAT.
+Jangan tambahkan teks apapun di luar JSON.
+${pairContext}
+
+INSTRUKSI ANALISA:
+1. STRUKTUR MARKET: Identifikasi trend (Bullish/Bearish/Sideways) berdasarkan higher high, higher low, lower high, lower low. Fokus pada struktur harga terbaru dan arah dominan market.
+2. SUPPORT & RESISTANCE: Tentukan area S/R terdekat yang paling valid dan jelas. Prioritaskan level yang sering disentuh atau terjadi rejection kuat. Sebutkan area yang berpotensi menjadi breakout atau reversal.
+3. PRICE ACTION & CANDLESTICK: Analisa candlestick terakhir - apakah reversal, continuation, breakout, rejection, engulfing, pin bar, atau momentum candle. Identifikasi apakah market sedang trending kuat atau mulai melemah.
+4. VALIDASI TRADING: JANGAN berikan entry melawan trend utama. HINDARI entry jika harga terlalu dekat resistance/support kuat. Jika market sideways sempit, choppy, atau tidak ada setup bagus, berikan WAIT. Fokus pada entry probabilitas terbaik.
+5. Entry paling optimal dan terdekat dengan harga saat ini. Stop Loss logis berdasarkan struktur market. Take Profit dengan Risk Reward minimal 1:2.
+
+Format respons HARUS persis seperti ini:
+{
+  "valid": true/false,
+  "invalid_reason": "alasan jika chart tidak jelas atau tidak bisa dianalisa",
+  "pair": "nama pair yang terdeteksi",
+  "timeframe": "timeframe chart",
+  "trend": "Bullish/Bearish/Sideways",
+  "market_structure": "deskripsi struktur: HH HL trending / LH LL trending / Choppy",
+  "fase": "Breakout/Pullback/Consolidation/Reversal",
+  "sesi": "Asia/London/New York/Tidak teridentifikasi",
+  "resistance": "harga angka",
+  "support": "harga angka",
+  "level_psikologis": "harga atau kosong",
+  "candlestick_signal": "jenis sinyal candlestick terakhir dan artinya singkat",
+  "market_condition": "TRENDING_KUAT/TRENDING_LEMAH/SIDEWAYS/VOLATILE",
+  "arah": "BUY/SELL/WAIT",
+  "entry_zone": "range harga",
+  "stop_loss": "harga",
+  "tp1": "harga",
+  "tp2": "harga",
+  "risk_reward": "rasio misal 1:2",
+  "confidence": angka 1-100,
+  "alasan": ["alasan 1", "alasan 2", "alasan 3"],
+  "invalidasi": ["kondisi 1", "kondisi 2"],
+  "catatan_tambahan": "catatan opsional"
+}
+
+ATURAN PENTING:
+- Analisa semua pair forex, komoditas (gold, silver), dan indeks
+- Jika chart tidak jelas, set valid=false dan isi invalid_reason
+- Jika tidak ada sinyal valid, set arah=WAIT
+- Prioritaskan keamanan modal dan akurasi di atas jumlah sinyal
+- Hindari entry agresif saat market choppy atau volatilitas tidak jelas
+- Fokus untuk trading intraday hari ini
+- Jangan analisa terlalu panjang, utamakan akurasi
+- Semua teks dalam Bahasa Indonesia`;
+
+  const apiKey = document.getElementById('apiKeyInput').value.trim();
+  if (!apiKey) {
+    resultsContainer.innerHTML = `<div class="error-box">⚠️ <strong>API Key Kosong</strong><br><br>Masukkan OpenAI API key dulu sebelum analisa.</div>`;
+    loading.classList.remove('show');
+    analyzeBtn.disabled = false;
+    return;
+  }
+
+  try {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: "gpt-5.5",
+        max_completion_tokens: 1000,
+        messages: [
+          {
+            role: "system",
+            content: systemPrompt
+          },
+          {
+            role: "user",
+            content: [
+              {
+                type: "image_url",
+                image_url: {
+                  url: `data:${selectedImageType || 'image/jpeg'};base64,${selectedImageBase64}`
+                }
+              },
+              {
+                type: "text",
+                text: `Analisa chart ini dan berikan respons JSON sesuai format.${selectedPair !== 'auto' ? ' Pair: ' + selectedPair : ''}`
+              }
+            ]
+          }
+        ]
+      })
+    });
+
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    const rawText = data.choices[0].message.content;
+
+    let clean = rawText.replace(/```json|```/g, '').trim();
+    const jsonStart = clean.indexOf('{');
+    const jsonEnd = clean.lastIndexOf('}');
+    if (jsonStart !== -1 && jsonEnd !== -1) {
+      clean = clean.substring(jsonStart, jsonEnd + 1);
+    }
+
+    const result = JSON.parse(clean);
+    renderResults(result);
+
+  } catch (err) {
+    resultsContainer.innerHTML = `
+      <div class="error-box">
+        ⚠️ <strong>Terjadi Kesalahan</strong><br><br>
+        ${err.message || 'Gagal menganalisa chart. Coba lagi.'}<br><br>
+        <small>Pastikan gambar chart jelas dan format valid.</small>
+      </div>`;
+  } finally {
+    loading.classList.remove('show');
+    analyzeBtn.disabled = false;
+  }
+}
+
+function renderResults(r) {
+  if (!r.valid) {
+    resultsContainer.innerHTML = `
+      <div class="error-box">
+        ⚠️ <strong>Chart Tidak Valid</strong><br><br>
+        ${r.invalid_reason || 'Chart tidak dapat dianalisa. Pastikan upload chart yang jelas.'}<br><br>
+        <small>Coba upload ulang dengan chart yang lebih jelas.</small>
+      </div>`;
+    return;
+  }
+
+  const trendClass = r.trend === 'Bullish' ? 'badge-bull' : r.trend === 'Bearish' ? 'badge-bear' : 'badge-neutral';
+  const dirClass = r.arah === 'BUY' ? 'buy' : r.arah === 'SELL' ? 'sell' : 'wait';
+  const dirIcon = r.arah === 'BUY' ? '🟢' : r.arah === 'SELL' ? '🔴' : '⏸';
+
+  const conditionClass = {'TRENDING_KUAT':'badge-bull','TRENDING_LEMAH':'badge-neutral','SIDEWAYS':'badge-neutral','VOLATILE':'badge-bear'}[r.market_condition] || 'badge-info';
+  const confidence = parseInt(r.confidence) || 0;
+  const confColor = confidence >= 70 ? '#00C896' : confidence >= 50 ? '#F0A500' : '#FF4757';
+
+  const alasanHTML = (r.alasan || []).map(a => `<li>${a}</li>`).join('');
+  const invalidasiHTML = (r.invalidasi || []).map(i => `<li>${i}</li>`).join('');
+
+  resultsContainer.innerHTML = `
+
+    <!-- KONDISI PASAR -->
+    <div class="result-section">
+      <div class="section-header">
+        <div class="section-num">1</div>
+        <div class="section-title">KONDISI PASAR</div>
+      </div>
+      <div class="section-body">
+        <div class="badge-row">
+          <span class="badge badge-info">📌 ${r.pair || '–'}</span>
+          <span class="badge badge-neutral">⏱ ${r.timeframe || 'H1'}</span>
+          <span class="badge ${trendClass}">${r.trend}</span>
+          <span class="badge badge-info">${r.fase}</span>
+          <span class="badge badge-neutral">🕐 ${r.sesi}</span>
+        </div>
+        <div class="badge-row">
+          <span class="badge ${conditionClass}">📊 ${(r.market_condition||'').replace('_',' ')}</span>
+        </div>
+        ${r.market_structure ? `<div class="level-item"><span class="level-label">🏗 Market Structure</span><span style="font-size:12px;font-family:'Space Mono',monospace;color:var(--gold-light)">${r.market_structure}</span></div>` : ''}
+      </div>
+    </div>
+
+    <!-- PRICE ACTION -->
+    <div class="result-section">
+      <div class="section-header">
+        <div class="section-num">2</div>
+        <div class="section-title">PRICE ACTION & CANDLESTICK</div>
+      </div>
+      <div class="section-body">
+        <div style="background:var(--surface2);border-radius:8px;padding:12px;font-size:13px;line-height:1.7;color:var(--text-muted);">
+          🕯️ ${r.candlestick_signal || 'Tidak teridentifikasi'}
+        </div>
+      </div>
+    </div>
+
+    <!-- LEVEL KUNCI -->
+    <div class="result-section">
+      <div class="section-header">
+        <div class="section-num">3</div>
+        <div class="section-title">LEVEL KUNCI</div>
+      </div>
+      <div class="section-body">
+        <div class="level-item">
+          <span class="level-label">🔴 Resistance Terdekat</span>
+          <span class="level-price" style="color:var(--red)">${r.resistance || '–'}</span>
+        </div>
+        <div class="level-item">
+          <span class="level-label">🟢 Support Terdekat</span>
+          <span class="level-price" style="color:var(--green)">${r.support || '–'}</span>
+        </div>
+        ${r.level_psikologis ? `
+        <div class="level-item">
+          <span class="level-label">⭐ Level Psikologis</span>
+          <span class="level-price" style="color:var(--gold)">${r.level_psikologis}</span>
+        </div>` : ''}
+      </div>
+    </div>
+
+    <!-- SINYAL TRADING -->
+    <div class="result-section">
+      <div class="section-header">
+        <div class="section-num">4</div>
+        <div class="section-title">SINYAL TRADING</div>
+      </div>
+      <div class="section-body" style="padding:0;">
+        <div class="signal-card">
+          <div class="signal-direction ${dirClass}">${dirIcon} ${r.arah}</div>
+          ${r.arah !== 'WAIT' ? `
+          <div class="signal-grid">
+            <div class="signal-item">
+              <div class="signal-label">Entry Zone</div>
+              <div class="signal-value">${r.entry_zone || '–'}</div>
+            </div>
+            <div class="signal-item">
+              <div class="signal-label">Stop Loss</div>
+              <div class="signal-value red">${r.stop_loss || '–'}</div>
+            </div>
+            <div class="signal-item">
+              <div class="signal-label">Target 1</div>
+              <div class="signal-value green">${r.tp1 || '–'}</div>
+            </div>
+            <div class="signal-item">
+              <div class="signal-label">Target 2</div>
+              <div class="signal-value green">${r.tp2 || '–'}</div>
+            </div>
+          </div>
+          <div style="padding:14px 16px; display:flex; align-items:center; justify-content:space-between; border-top:1px solid var(--border);">
+            <span style="font-size:12px; color:var(--text-muted)">Risk / Reward Ratio</span>
+            <span class="rr-badge">⚖️ ${r.risk_reward || '–'}</span>
+          </div>
+          ` : `
+          <div style="padding:20px; text-align:center; font-size:13px; color:var(--text-muted); line-height:1.7;">
+            ${r.catatan_tambahan || 'Kondisi pasar belum mendukung untuk entry. Tunggu konfirmasi lebih lanjut.'}
+          </div>
+          `}
+        </div>
+      </div>
+    </div>
+
+    <!-- CONFIDENCE SCORE -->
+    <div class="result-section">
+      <div class="section-header">
+        <div class="section-num">5</div>
+        <div class="section-title">CONFIDENCE SCORE</div>
+      </div>
+      <div class="section-body">
+        <div style="display:flex;justify-content:space-between;font-size:11px;font-family:'Space Mono',monospace;margin-bottom:6px;">
+          <span style="color:var(--text-muted)">Probabilitas Setup</span>
+          <span style="color:${confColor};font-weight:700;">${confidence}/100</span>
+        </div>
+        <div style="background:var(--surface3);border-radius:8px;overflow:hidden;height:8px;">
+          <div style="width:${confidence}%;height:100%;border-radius:8px;background:${confColor};transition:width 1s ease;"></div>
+        </div>
+        <div style="margin-top:10px;font-size:11px;color:var(--text-muted);">
+          ${confidence >= 70 ? '✅ Setup layak dieksekusi dengan manajemen risiko ketat.' : confidence >= 50 ? '⚠️ Setup cukup, perlu konfirmasi tambahan.' : '❌ Probabilitas rendah, pertimbangkan untuk WAIT.'}
+        </div>
+      </div>
+    </div>
+
+    <!-- ALASAN SINYAL -->
+    <div class="result-section">
+      <div class="section-header">
+        <div class="section-num">6</div>
+        <div class="section-title">ALASAN SINYAL</div>
+      </div>
+      <div class="section-body">
+        <ul class="reason-list">${alasanHTML}</ul>
+      </div>
+    </div>
+
+    <!-- CATATAN RISIKO -->
+    <div class="result-section">
+      <div class="section-header">
+        <div class="section-num">7</div>
+        <div class="section-title">CATATAN RISIKO</div>
+      </div>
+      <div class="section-body">
+        <div class="risk-box">
+          <div class="risk-title">⚠️ Kondisi Invalidasi</div>
+          <ul class="reason-list">${invalidasiHTML}</ul>
+        </div>
+        ${r.catatan_tambahan && r.arah !== 'WAIT' ? `
+        <div style="margin-top:12px;font-size:12px;color:var(--text-muted);line-height:1.7;">
+          💡 ${r.catatan_tambahan}
+        </div>` : ''}
+      </div>
+    </div>
+
+  `;
+
+  resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+</script>
+</body>
+</html>
